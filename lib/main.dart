@@ -37,7 +37,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
 
     Future.delayed(
-      const Duration(seconds: 5),
+      const Duration(seconds: 1),
       movetofront,
     );
   }
@@ -45,10 +45,7 @@ class _MainPageState extends State<MainPage> {
   @override
   void dispose() {
     super.dispose();
-    Future.delayed(
-      const Duration(seconds: 2),
-      movetofront,
-    );
+    movetofront();
   }
 
   @override
