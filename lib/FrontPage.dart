@@ -26,6 +26,28 @@ class WeatherData {
 class FrontPageState extends State<FrontPage> {
   bool _isSearchMode = false;
   WeatherData? _weatherData;
+  String? currentLocation;
+
+  TextEditingController _searchController = TextEditingController();
+
+  void _handleSearchSubmit(String input) {
+    _updateCityName(input);
+
+    setState(() {
+      _isSearchMode = false;
+    });
+  }
+
+  void _updateCityName(String input) {
+    setState(() {
+      cityName = input;
+      currentLocation = cityName;
+    });
+    _fetchWeatherData(); // Fetch weather data for the new city name
+  }
+
+  final Icon searchIcon = Icon(Icons.search);
+  final Icon submitIcon = Icon(Icons.check);
 
   String apiKey =
       '36e59374a03c4a1d9fd141844232807'; // Replace with your actual API key
@@ -71,14 +93,25 @@ class FrontPageState extends State<FrontPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: _isSearchMode ? TextField() : const Text('Stormy'),
+        title: _isSearchMode
+            ? TextField(
+                controller: _searchController,
+                onSubmitted: _handleSearchSubmit,
+                decoration: const InputDecoration(
+                  hintText: 'Enter city name',
+                ),
+              )
+            : const Text('Stormy'),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: _isSearchMode ? submitIcon : searchIcon,
             onPressed: () {
               setState(() {
                 _isSearchMode = !_isSearchMode;
+                if (!_isSearchMode) {
+                  _updateCityName(_searchController.text);
+                }
               });
             },
           ),
@@ -103,6 +136,12 @@ class FrontPageState extends State<FrontPage> {
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          if (currentLocation != null)
+                            Text(
+                              '$currentLocation',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
                           Text('Temperature: ${_weatherData!.temperature} °C'),
                           Text('Humidity: ${_weatherData!.humidity}%'),
                           Text('Condition: ${_weatherData!.conditionText}'),
