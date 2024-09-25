@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FrontPage extends StatefulWidget {
   const FrontPage({Key? key}) : super(key: key);
@@ -144,7 +145,25 @@ class FrontPageState extends State<FrontPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      drawer: const Drawer(),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () => launchUrl(
+                Uri.parse('https://sajidnoor.com'),
+              ),
+              child: const UserAccountsDrawerHeader(
+                accountName: Text('Sajid Noor'),
+                accountEmail: Text('sajidnoor.com'),
+                currentAccountPicture: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      'https://sajidnoor.com/wp-content/uploads/2024/06/profileDEV.jpg'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -181,43 +200,40 @@ class FrontPageState extends State<FrontPage> {
             });
           }
         },
-        child: Column(
-          children: [
-            Container(
-              height: MediaQuery.of(context).size.height / 1.5,
-              width: MediaQuery.of(context).size.width * 1,
-              color: Colors.white,
-              child: Center(
-                child: _weatherData != null
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (currentLocation != null)
-                            Text(
-                              'Current Location: $currentLocation',
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          Text('Temperature: ${_weatherData!.temperature} °C'),
-                          Text('Humidity: ${_weatherData!.humidity}%'),
-                          Text('Condition: ${_weatherData!.conditionText}'),
-                          Image.network(_weatherData!.iconUrl),
-                        ],
-                      )
-                    : errorMessage != null
-                        ? Text(
-                            errorMessage!,
-                            style: const TextStyle(
-                                color: Colors.red, fontWeight: FontWeight.bold),
-                          )
-                        : const CircularProgressIndicator(),
+        child: Expanded(
+          child: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/bg-weather.png'),
+                fit: BoxFit.cover,
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width * 1,
-              color: Colors.white,
+            child: Center(
+              child: _weatherData != null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (currentLocation != null)
+                          Text(
+                            'Current Location: $currentLocation',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        Text('Temperature: ${_weatherData!.temperature} °C'),
+                        Text('Humidity: ${_weatherData!.humidity}%'),
+                        Text('Condition: ${_weatherData!.conditionText}'),
+                        Image.network(_weatherData!.iconUrl),
+                      ],
+                    )
+                  : errorMessage != null
+                      ? Text(
+                          errorMessage!,
+                          style: const TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
+                        )
+                      : const CircularProgressIndicator(),
             ),
-          ],
+          ),
         ),
       ),
     );

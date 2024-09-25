@@ -9,6 +9,7 @@ environment:
   sdk: ">=3.0.6 <4.0.0"
 
 dependencies:
+  url_launcher: ^6.3.0
   geocoding: ^2.1.0
   geolocator: ^9.0.2
   http: ^1.1.0
@@ -25,3 +26,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
