@@ -186,7 +186,7 @@ class FrontPageState extends State<FrontPage> {
             Container(
               height: MediaQuery.of(context).size.height / 1.5,
               width: MediaQuery.of(context).size.width * 1,
-              color: Colors.grey,
+              color: Colors.white,
               child: Center(
                 child: _weatherData != null
                     ? Column(
