@@ -9,6 +9,7 @@ environment:
   sdk: ">=3.0.6 <4.0.0"
 
 dependencies:
+  google_fonts: ^6.2.1
   url_launcher: ^6.3.0
   geocoding: ^2.1.0
   geolocator: ^9.0.2

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:stormy/FrontPage.dart';
 
 void main() {
@@ -11,7 +12,13 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Colors.teal,
+          secondary: Colors.teal,
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       title: 'Stormy',
       home: MainPage(),
@@ -52,10 +59,16 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: const Center(
+      child: Center(
         child: Text(
-          'Stormy',
-          style: TextStyle(color: Colors.black),
+          'STORMY',
+          style: GoogleFonts.montserrat(
+            textStyle: const TextStyle(
+                color: Colors.teal,
+                letterSpacing: .5,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.none),
+          ),
         ),
       ),
     );

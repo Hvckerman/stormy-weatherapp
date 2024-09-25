@@ -100,8 +100,7 @@ class FrontPageState extends State<FrontPage> {
   final Icon searchIcon = Icon(Icons.search);
   final Icon submitIcon = Icon(Icons.check);
 
-  String apiKey =
-      'a7e37dd0477f150b691062e7c639a182'; // Replace with your OpenWeatherMap Api key
+  String apiKey = 'a7e37dd0477f150b691062e7c639a182'; // OpenWeather API
   String cityName = 'Karachi';
 
   @override
@@ -143,95 +142,102 @@ class FrontPageState extends State<FrontPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      drawer: Drawer(
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: () => launchUrl(
-                Uri.parse('https://sajidnoor.com'),
-              ),
-              child: const UserAccountsDrawerHeader(
-                accountName: Text('Sajid Noor'),
-                accountEmail: Text('sajidnoor.com'),
-                currentAccountPicture: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://sajidnoor.com/wp-content/uploads/2024/06/profileDEV.jpg'),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        drawer: Drawer(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () => launchUrl(
+                  Uri.parse('https://sajidnoor.com'),
+                ),
+                child: const UserAccountsDrawerHeader(
+                  accountName: Text('Sajid Noor'),
+                  accountEmail: Text('sajidnoor.com'),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        'https://sajidnoor.com/wp-content/uploads/2024/06/profileDEV.jpg'),
+                  ),
                 ),
               ),
+            ],
+          ),
+        ),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: _isSearchMode
+              ? TextField(
+                  controller: _searchController,
+                  onSubmitted: _handleSearchSubmit,
+                  decoration: InputDecoration(
+                    hintText: 'Enter city name',
+                    errorText: errorMessage,
+                  ),
+                )
+              : const Text('Stormy'),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: _isSearchMode ? submitIcon : searchIcon,
+              onPressed: () {
+                setState(() {
+                  _isSearchMode = !_isSearchMode;
+                  if (!_isSearchMode) {
+                    _handleSearchSubmit(_searchController.text);
+                  }
+                });
+              },
             ),
           ],
         ),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: _isSearchMode
-            ? TextField(
-                controller: _searchController,
-                onSubmitted: _handleSearchSubmit,
-                decoration: InputDecoration(
-                  hintText: 'Enter city name',
-                  errorText: errorMessage,
-                ),
-              )
-            : const Text('Stormy'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: _isSearchMode ? submitIcon : searchIcon,
-            onPressed: () {
+        body: GestureDetector(
+          onTap: () {
+            if (_isSearchMode) {
               setState(() {
-                _isSearchMode = !_isSearchMode;
-                if (!_isSearchMode) {
-                  _handleSearchSubmit(_searchController.text);
-                }
+                _isSearchMode = false;
               });
-            },
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: () {
-          if (_isSearchMode) {
-            setState(() {
-              _isSearchMode = false;
-            });
-          }
-        },
-        child: Expanded(
-          child: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/bg-weather.png'),
-                fit: BoxFit.cover,
+            }
+          },
+          child: Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/bg-weather.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            child: Center(
-              child: _weatherData != null
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (currentLocation != null)
-                          Text(
-                            'Current Location: $currentLocation',
+              child: Center(
+                child: _weatherData != null
+                    ? SingleChildScrollView(
+                        // Wrap the Column in SingleChildScrollView
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (currentLocation != null)
+                              Text(
+                                'Current Location: $currentLocation',
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            Text(
+                                'Temperature: ${_weatherData!.temperature} °C'),
+                            Text('Humidity: ${_weatherData!.humidity}%'),
+                            Text('Condition: ${_weatherData!.conditionText}'),
+                            Image.network(_weatherData!.iconUrl),
+                          ],
+                        ),
+                      )
+                    : errorMessage != null
+                        ? Text(
+                            errorMessage!,
                             style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        Text('Temperature: ${_weatherData!.temperature} °C'),
-                        Text('Humidity: ${_weatherData!.humidity}%'),
-                        Text('Condition: ${_weatherData!.conditionText}'),
-                        Image.network(_weatherData!.iconUrl),
-                      ],
-                    )
-                  : errorMessage != null
-                      ? Text(
-                          errorMessage!,
-                          style: const TextStyle(
-                              color: Colors.red, fontWeight: FontWeight.bold),
-                        )
-                      : const CircularProgressIndicator(),
+                                color: Colors.red, fontWeight: FontWeight.bold),
+                          )
+                        : const CircularProgressIndicator(),
+              ),
             ),
           ),
         ),
