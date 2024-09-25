@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart'; // Add this import for geocoding
+import 'package:geocoding/geocoding.dart';
 
 class FrontPage extends StatefulWidget {
   const FrontPage({Key? key}) : super(key: key);
@@ -29,63 +29,85 @@ class FrontPageState extends State<FrontPage> {
   bool _isSearchMode = false;
   WeatherData? _weatherData;
   String? currentLocation;
+  String? errorMessage;
 
   TextEditingController _searchController = TextEditingController();
 
-  Future<void> _fetchWeatherData() async {
+  Future<void> _fetchWeatherByCity(String cityName) async {
     try {
       final response = await http.get(Uri.parse(
-          'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$cityName&aqi=no'));
+          'https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$apiKey'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Reset any previous error message
+        setState(() {
+          errorMessage = null;
+          currentLocation = cityName;
+        });
+
+        double latitude = data['coord']['lat'];
+        double longitude = data['coord']['lon'];
+
+        await _fetchDetailedWeatherData(latitude, longitude);
+      } else if (response.statusCode == 404) {
+        setState(() {
+          errorMessage = 'City not found';
+          _weatherData = null;
+        });
+      } else {
+        print('Error fetching city data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> _fetchDetailedWeatherData(double lat, double lon) async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lon&exclude=minutely,hourly,daily&appid=$apiKey&units=metric'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
         setState(() {
           _weatherData = WeatherData(
-            temperature: data['current']['temp_c'].toDouble(),
+            temperature: data['current']['temp'].toDouble(),
             humidity: data['current']['humidity'].toDouble(),
-            conditionText: data['current']['condition']['text'],
-            iconUrl: 'http:${data['current']['condition']['icon']}',
+            conditionText: data['current']['weather'][0]['description'],
+            iconUrl:
+                'https://openweathermap.org/img/wn/${data['current']['weather'][0]['icon']}@2x.png',
           );
         });
       } else {
-        // Handle API error
-        print('Failed to fetch weather data: ${response.statusCode}');
+        print('Failed to fetch detailed weather data: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle other errors
-      print('Error: $e');
+      print('Error fetching detailed weather data: $e');
     }
   }
 
   void _handleSearchSubmit(String input) {
-    _updateCityName(input);
-
     setState(() {
       _isSearchMode = false;
     });
-  }
-
-  void _updateCityName(String input) {
-    setState(() {
-      cityName = input;
-      currentLocation = cityName;
-    });
-    _fetchWeatherData(); // Fetch weather data for the new city name
+    _fetchWeatherByCity(input);
   }
 
   final Icon searchIcon = Icon(Icons.search);
   final Icon submitIcon = Icon(Icons.check);
 
   String apiKey =
-      '36e59374a03c4a1d9fd141844232807'; // Replace with your actual API key
+      'a7e37dd0477f150b691062e7c639a182'; // Replace with your OpenWeatherMap Api key
   String cityName = 'Karachi';
 
   @override
   void initState() {
     super.initState();
-    _fetchWeatherData();
-    _fetchUserLocation(); // Fetch user's current location
+    _fetchWeatherByCity(cityName);
+    _fetchUserLocation();
   }
 
   void _fetchUserLocation() async {
@@ -93,7 +115,6 @@ class FrontPageState extends State<FrontPage> {
       LocationPermission permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        // Handle if the user denies location permission
         print('Location permission denied.');
         return;
       }
@@ -102,7 +123,6 @@ class FrontPageState extends State<FrontPage> {
         desiredAccuracy: LocationAccuracy.medium,
       );
 
-      // Use Geocoding to get the location name from latitude and longitude
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
 
@@ -111,11 +131,9 @@ class FrontPageState extends State<FrontPage> {
             '${placemarks.first.locality}, ${placemarks.first.country}';
         setState(() {
           currentLocation = locationName;
-          if (cityName == 'Karachi') {
-            cityName = locationName;
-          }
         });
-        _fetchWeatherData(); // Fetch weather data for the user's location
+
+        _fetchWeatherByCity(locationName);
       }
     } catch (e) {
       print('Error getting user location: $e');
@@ -134,8 +152,9 @@ class FrontPageState extends State<FrontPage> {
             ? TextField(
                 controller: _searchController,
                 onSubmitted: _handleSearchSubmit,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Enter city name',
+                  errorText: errorMessage,
                 ),
               )
             : const Text('Stormy'),
@@ -147,7 +166,7 @@ class FrontPageState extends State<FrontPage> {
               setState(() {
                 _isSearchMode = !_isSearchMode;
                 if (!_isSearchMode) {
-                  _updateCityName(_searchController.text);
+                  _handleSearchSubmit(_searchController.text);
                 }
               });
             },
@@ -185,7 +204,13 @@ class FrontPageState extends State<FrontPage> {
                           Image.network(_weatherData!.iconUrl),
                         ],
                       )
-                    : const CircularProgressIndicator(),
+                    : errorMessage != null
+                        ? Text(
+                            errorMessage!,
+                            style: const TextStyle(
+                                color: Colors.red, fontWeight: FontWeight.bold),
+                          )
+                        : const CircularProgressIndicator(),
               ),
             ),
             Container(
