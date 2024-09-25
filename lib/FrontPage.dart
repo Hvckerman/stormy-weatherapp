@@ -212,7 +212,6 @@ class FrontPageState extends State<FrontPage> {
               child: Center(
                 child: _weatherData != null
                     ? SingleChildScrollView(
-                        // Wrap the Column in SingleChildScrollView
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
