@@ -100,7 +100,7 @@ class FrontPageState extends State<FrontPage> {
   final Icon searchIcon = Icon(Icons.search);
   final Icon submitIcon = Icon(Icons.check);
 
-  String apiKey = 'a7e37dd0477f150b691062e7c639a182'; // OpenWeather API
+  String apiKey = 'Your API Key'; // OpenWeather API
   String cityName = 'Karachi';
 
   @override

@@ -1,16 +1,22 @@
-# stormy
+STORMY
 
-A new Flutter project.
+A Weather App built with flutter, using OpenWeatherMap API
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+How to build:
 
-A few resources to get you started if this is your first Flutter project:
+1- git clone https://github.com/Hvckerman/stormy.git
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+2- change apiKey = 'Your API Key'; to your OpenWeatherMap API key, 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+3- flutter build apk --release
+
+4- after build successful, copy the apk file from here stormy\build\app\outputs\flutter-apk\app-release.apk to your mobile device and install it.
+
+5- done!
+
+Tested with:
+
+Flutter 3.24.0 Stable
+JDK 8u202 (64-bit)
+Android SDK version 35.0.0
