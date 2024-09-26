@@ -201,42 +201,39 @@ class FrontPageState extends State<FrontPage> {
               });
             }
           },
-          child: Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/bg-weather.png'),
-                  fit: BoxFit.cover,
-                ),
+          child: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/bg-weather.png'),
+                fit: BoxFit.cover,
               ),
-              child: Center(
-                child: _weatherData != null
-                    ? SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (currentLocation != null)
-                              Text(
-                                'Current Location: $currentLocation',
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
+            ),
+            child: Center(
+              child: _weatherData != null
+                  ? SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (currentLocation != null)
                             Text(
-                                'Temperature: ${_weatherData!.temperature} °C'),
-                            Text('Humidity: ${_weatherData!.humidity}%'),
-                            Text('Condition: ${_weatherData!.conditionText}'),
-                            Image.network(_weatherData!.iconUrl),
-                          ],
-                        ),
-                      )
-                    : errorMessage != null
-                        ? Text(
-                            errorMessage!,
-                            style: const TextStyle(
-                                color: Colors.red, fontWeight: FontWeight.bold),
-                          )
-                        : const CircularProgressIndicator(),
-              ),
+                              'Current Location: $currentLocation',
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          Text('Temperature: ${_weatherData!.temperature} °C'),
+                          Text('Humidity: ${_weatherData!.humidity}%'),
+                          Text('Condition: ${_weatherData!.conditionText}'),
+                          Image.network(_weatherData!.iconUrl),
+                        ],
+                      ),
+                    )
+                  : errorMessage != null
+                      ? Text(
+                          errorMessage!,
+                          style: const TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
+                        )
+                      : const CircularProgressIndicator(),
             ),
           ),
         ),
